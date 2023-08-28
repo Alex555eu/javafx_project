@@ -1,3 +1,4 @@
+
 module com.example.jfx_project {
     requires javafx.controls;
     requires javafx.fxml;
