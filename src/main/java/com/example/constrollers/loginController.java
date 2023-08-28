@@ -1,11 +1,12 @@
-package com.example.jfx_project;
+package com.example.constrollers;
 
+import com.example.utils.PopUp;
+import com.example.utils.onlineDB;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -13,14 +14,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
-import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -32,9 +28,14 @@ public class loginController implements Initializable {
     @FXML
     private Button onlineButton;
     @FXML
-    private ProgressIndicator lodingProgressIndicator;
+    private ProgressIndicator lodingProgressIndicator; //TODO: add threading
 
-
+    /**
+     * Handles the 'On Mouse Entered' event of the buttons.
+     * Changes the background color of buttons, when cursor hovers over them.
+     *
+     * @param event The event triggered by "On Mouse Entered" action.
+     */
     @FXML
     private void hoverOverButtonEnter(MouseEvent event) {
         if (event.getSource() == offlineButton) {
@@ -44,6 +45,12 @@ public class loginController implements Initializable {
         }
     }
 
+    /**
+     * Handles the 'On Mouse Exited' event of the buttons.
+     * Changes the background color of buttons, when cursor stops hovering over them.
+     *
+     * @param event The event triggered by "On Mouse Exited" action.
+     */
     @FXML
     private void hoverOverButtonExit(MouseEvent event) {
         if (event.getSource() == offlineButton) {
@@ -53,6 +60,12 @@ public class loginController implements Initializable {
         }
     }
 
+    /**
+     * Loads and displays the main application user interface.
+     *
+     * @param event The event that triggers the loading of the application interface.
+     * @throws IOException If an I/O error occurs while loading the FXML file.
+     */
     private void loadApp(Event event) throws IOException {
         Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
 
@@ -76,9 +89,14 @@ public class loginController implements Initializable {
         primaryStage.show();
     }
 
+    /**
+     * Triggers the loadApp function, if connection with database is established.
+     *
+     * @param event The event triggered by "onlineButton" button;
+     */
     @FXML
     private void connectOnlineDB(ActionEvent event) {
-        lodingProgressIndicator.setVisible(true);
+        //lodingProgressIndicator.setVisible(true);
         offlineButton.setDisable(true);
         onlineButton.setDisable(true);
 
@@ -91,56 +109,40 @@ public class loginController implements Initializable {
         } else {
             offlineButton.setDisable(false);
             onlineButton.setDisable(false);
-            lodingProgressIndicator.setVisible(false);
-            announcementPopUp(event, "Blad sieci");
+            //lodingProgressIndicator.setVisible(false);
+            PopUp.announcementPopUp(event, "Blad sieci");
         }
     }
 
+    /**
+     * Handles the action of connecting to the offline database and loading the application interface.
+     *
+     * @param event The event triggered by "offlineButton" button.
+     */
     @FXML
     private void connectOfflineDB(ActionEvent event) {
-        lodingProgressIndicator.setVisible(true);
+        //lodingProgressIndicator.setVisible(true);
         offlineButton.setDisable(true);
         onlineButton.setDisable(true);
         try {
             loadApp(event);
-
         }  catch (IOException e) {
             e.printStackTrace();
             offlineButton.setDisable(false);
             onlineButton.setDisable(false);
-            lodingProgressIndicator.setVisible(false);
-            announcementPopUp(event, "Blad wczytywania");
+            //lodingProgressIndicator.setVisible(false);
+            PopUp.announcementPopUp(event, "Blad wczytywania pliku");
         }
     }
-
-
-    private void announcementPopUp(ActionEvent event, String announcement) {
-        Stage confstage = (Stage)((Node)event.getSource()).getScene().getWindow();
-
-        final Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.initOwner(confstage);
-
-        Text dialogText = new Text(announcement);
-        dialogText.setFont(Font.font("Verdana", 16));
-
-        VBox dialogVbox = new VBox(20);
-        dialogVbox.setAlignment(Pos.CENTER);
-        dialogVbox.getChildren().addAll(dialogText);
-
-        Scene dialogScene = new Scene(dialogVbox, 300, 200);
-        stage.setScene(dialogScene);
-        stage.showAndWait();
-    }
-
+    /**
+     * Initializes the application's user interface upon startup.
+     * This method is automatically called by JavaFX after the FXML file is loaded.
+     *
+     * @param url The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param resource The resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
+    public void initialize(URL url, ResourceBundle resource) {
         lodingProgressIndicator.setVisible(false);
-
     }
-
-
-
-
 }

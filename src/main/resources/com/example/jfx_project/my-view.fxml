@@ -20,7 +20,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="myPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1040.0" prefWidth="1920.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.jfx_project.Controller">
+<AnchorPane fx:id="myPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1040.0" prefWidth="1920.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.constrollers.Controller">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" height="1040.0" stroke="BLACK" strokeType="INSIDE" width="1920.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <fill>
@@ -50,7 +50,7 @@
                </VBox.margin>
                <children>
                   <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#001648" height="50.0" strokeType="INSIDE" strokeWidth="0.0" width="752.0" />
-                  <Button fx:id="tableModifyButton" layoutX="627.0" layoutY="-1.0" mnemonicParsing="false" onAction="#modifyDataAction" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Modyfikuj" AnchorPane.bottomAnchor="15.0" />
+                  <Button fx:id="modifyButton" layoutX="627.0" layoutY="-1.0" mnemonicParsing="false" onAction="#enterModifyState" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Modyfikuj" AnchorPane.bottomAnchor="15.0" />
                </children>
             </AnchorPane>
             <HBox prefHeight="300.0" spacing="50.0">
@@ -216,9 +216,9 @@
             <AnchorPane prefHeight="47.0" prefWidth="728.0">
                <children>
                   <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#001648" height="50.0" strokeType="INSIDE" strokeWidth="0.0" width="752.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                  <Button fx:id="tableAcceptButton" layoutX="607.0" layoutY="50.0" mnemonicParsing="false" onAction="#acceptDataAction" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Potwierdz" AnchorPane.rightAnchor="21.0" />
-                  <Button fx:id="tableCancelButton" layoutX="500.0" layoutY="50.0" mnemonicParsing="false" onAction="#cancelDataAction" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Anuluj" />
-                  <Button fx:id="tableDeleteButton" layoutX="36.0" layoutY="52.0" mnemonicParsing="false" onAction="#deleteDataAction" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Usuń" AnchorPane.leftAnchor="21.0" />
+                  <Button fx:id="acceptButton" layoutX="607.0" layoutY="50.0" mnemonicParsing="false" onAction="#acceptDataAction" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Potwierdz" AnchorPane.rightAnchor="21.0" />
+                  <Button fx:id="cancelButton" layoutX="500.0" layoutY="50.0" mnemonicParsing="false" onAction="#exitModifyState" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Anuluj" />
+                  <Button fx:id="deleteButton" layoutX="36.0" layoutY="52.0" mnemonicParsing="false" onAction="#deleteDataAction" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Usuń" AnchorPane.leftAnchor="21.0" />
                </children>
                <padding>
                   <Insets bottom="-40.0" left="-11.0" right="-11.0" top="40.0" />
@@ -269,8 +269,8 @@
          </children>
       </HBox>
       <Rectangle arcHeight="10.0" arcWidth="10.0" fill="#001648" height="50.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="1920.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <Button fx:id="tableAddButton" layoutX="14.0" layoutY="11.0" mnemonicParsing="false" onAction="#addDataAction" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Nowe zamówienie" />
-      <Button fx:id="tableSaveButton" layoutX="176.0" layoutY="11.0" mnemonicParsing="false" onAction="#offlineSave" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Zrzuć do pliku" />
+      <Button fx:id="addButton" layoutX="14.0" layoutY="11.0" mnemonicParsing="false" onAction="#enterNewDataState" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Nowe zamówienie" />
+      <Button fx:id="saveButton" layoutX="176.0" layoutY="11.0" mnemonicParsing="false" onAction="#offlineSave" onMouseEntered="#hoverOverButtonEnter" onMouseExited="#hoverOverButtonExit" prefHeight="25.0" prefWidth="150.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-radius: 15; -fx-background-insets: 1; -fx-border-width: 3; -fx-border-color: #ce5c20;" text="Zrzuć do pliku" />
       <AnchorPane layoutX="700.0" layoutY="872.0" />
       <Label layoutX="1736.0" layoutY="5.0" prefHeight="43.0" prefWidth="110.0" text="Notes" textFill="WHITE">
          <font>

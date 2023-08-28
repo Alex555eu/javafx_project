@@ -14,8 +14,17 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import javafx.scene.Parent;
 
+/**
+ * The main class of the Notes application, extending JavaFX's Application class.
+ */
 public class myApp extends Application {
 
+    /**
+     * The entry point of the application, responsible for setting up and displaying the initial user interface.
+     *
+     * @param primaryStage The primary stage provided by the JavaFX runtime.
+     * @throws IOException If an I/O error occurs while loading the FXML file.
+     */
     @Override
     public void start(Stage primaryStage) throws IOException {
 

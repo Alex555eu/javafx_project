@@ -1,9 +1,13 @@
-package com.example.jfx_project;
+package com.example.constrollers;
 
+import com.example.jfx_project.Person;
+import com.example.jfx_project.SearchTool;
+import com.example.utils.PopUp;
+import com.example.utils.offlineDB;
+import com.example.utils.onlineDB;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -11,12 +15,9 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import javafx.fxml.FXML;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -26,7 +27,6 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
@@ -36,8 +36,7 @@ import java.util.TreeMap;
 
 public class Controller implements Initializable {
 
-    @FXML
-    private AnchorPane myPane;
+    /* Left wing segment. Variables representing tables columns, search elements and the table itself */
     @FXML
     private TableView<Person> myTable;
     @FXML
@@ -60,6 +59,14 @@ public class Controller implements Initializable {
     private TableColumn<Person, Integer> tableStatus;
     @FXML
     private TextField tableSearchBar;
+    @FXML
+    private DatePicker tableDateFrom;
+    @FXML
+    private DatePicker tableDateTo;
+    @FXML
+    private Label orderedSumLabel; // Label displaying sum of ordered products after filtering
+
+    /* Right wing segment */
     @FXML
     private TextField idTextField;
     @FXML
@@ -85,40 +92,42 @@ public class Controller implements Initializable {
     @FXML
     private TextArea infoTextArea;
     @FXML
-    private Label orderedSumLabel;
-    @FXML
-    private DatePicker tableDateFrom;
-    @FXML
-    private DatePicker tableDateTo;
-    @FXML
     private ChoiceBox<String> tableSearchChoiceBox;
     private final String[] choiceBoxSearchOptions = {"Wszystko", "Nr.id", "Kod pocztowy", "Miasto", "Nr.telefonu", "Nazwisko", "Nazwa", "Status", "Opis"};
     @FXML
-    private Button tableModifyButton;
+    private Button modifyButton; // Button directing app to 'modify state'
     @FXML
-    private Button tableCancelButton;
+    private Button cancelButton; // Button cancelling modification of old or adding new element
     @FXML
-    private Button tableAcceptButton;
+    private Button acceptButton; // Button accepting modification of old or adding new element
     @FXML
-    private Button tableDeleteButton;
+    private Button deleteButton; // Button deleting selected record from database
+
+    /* Upper side (toolbar) segment */
     @FXML
-    private Button tableAddButton;
+    private Button addButton;    // Button directing app to a 'new record state'
     @FXML
-    private Button tableSaveButton;
+    private Button saveButton;   // Button for serialization of a current orders list (back up file)
+
     @FXML
     private ChoiceBox<String> productChoiceBox;
-    private final Map<String, Integer> speciesOptions = new TreeMap<>(Map.of("Ges Biala",1, "Ges Szara",2, "Pekin",3, "Barbarie",4, "Mulard",5));
+    private final Map<String, Integer> productOptions = new TreeMap<>(Map.of("Ges Biala",1, "Ges Szara",2, "Pekin",3, "Barbarie",4, "Mulard",5)); //TODO: make app fetch product items by itself from database
     @FXML
     private ChoiceBox<String> statusChoiceBox;
     private final Map<String, Integer> statusOptions = new TreeMap<>(Map.of("AKTYWNE",1, "ZAKOŃCZONE",2, "UWAGA I",3, "UWAGA II",4));
+
     private final Map<Integer, String> colorOptions = new TreeMap<>(Map.of(1, "-fx-text-fill: #63C05F;", 2, "-fx-text-fill: #4CCEF6;", 3, "-fx-text-fill: #c6c300;", 4, "-fx-text-fill: #FE6666;"));
 
+    /**
+     * Main container holding data from database.
+     */
     private ObservableList<Person> myTableObservableList;
-    private FilteredList<Person> filteredList;
-    private SortedList<Person> sortedList;
+    private FilteredList<Person> filteredList; // List pointing to the location of data, used for filtrating purposes.
+    private SortedList<Person> sortedList; // List pointing to the location of ata, used for binding data to UI component built-in sorting functions.
 
-
-
+    /**
+     * Function updating sum of product amount from ACTIVE orders.
+     */
     private void orderedSumUpdate() {
         int sum=0;
         for(Person person : sortedList) {
@@ -129,60 +138,81 @@ public class Controller implements Initializable {
         orderedSumLabel.setText(String.valueOf(sum));
     }
 
+    /**
+     * Handles the click event of the "saveButton" button.
+     * Function uses offlineDB`s saveToFile function to serialize all objects which currently hold our data.
+     */
     @FXML
     private void offlineSave() {
-        tableSaveButton.setDisable(true);
+        saveButton.setDisable(true);
         offlineDB.saveToFile(new ArrayList<>(myTableObservableList));
-        tableSaveButton.setDisable(false);
+        saveButton.setDisable(false);
     }
 
+    /**
+     * Handles the 'On Mouse Entered' event of the buttons.
+     * Function changes the background color of buttons, when cursor hovers over them.
+     *
+     * @param event
+     */
     @FXML
     private void hoverOverButtonEnter(MouseEvent event) {
-        if (event.getSource() == tableAddButton) {
-            tableAddButton.setStyle(tableAddButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #63C05F;"));
+        if (event.getSource() == addButton) {
+            addButton.setStyle(addButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #63C05F;"));
 
-        } else if(event.getSource() == tableSaveButton) {
-            tableSaveButton.setStyle(tableSaveButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #4CCEF6;"));
+        } else if(event.getSource() == saveButton) {
+            saveButton.setStyle(saveButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #4CCEF6;"));
 
-        } else if(event.getSource() == tableModifyButton) {
-            tableModifyButton.setStyle(tableModifyButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color:  #ce5c20;"));
+        } else if(event.getSource() == modifyButton) {
+            modifyButton.setStyle(modifyButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color:  #ce5c20;"));
 
-        } else if(event.getSource() == tableDeleteButton) {
-            tableDeleteButton.setStyle(tableDeleteButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #FE6666;"));
+        } else if(event.getSource() == deleteButton) {
+            deleteButton.setStyle(deleteButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #FE6666;"));
 
-        } else if(event.getSource() == tableCancelButton) {
-            tableCancelButton.setStyle(tableCancelButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #FE6666;"));
+        } else if(event.getSource() == cancelButton) {
+            cancelButton.setStyle(cancelButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #FE6666;"));
 
-        } else if(event.getSource() == tableAcceptButton) {
-            tableAcceptButton.setStyle(tableAcceptButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #63C05F;"));
+        } else if(event.getSource() == acceptButton) {
+            acceptButton.setStyle(acceptButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: #63C05F;"));
         }
     }
 
+    /**
+     * Handles the 'On Mouse Exited' event of the buttons.
+     * Changes the background color of buttons, when cursor stops hovering over them.
+     *
+     * @param event The event triggered by "On Mouse Exited" action.
+     */
     @FXML
     private void hoverOverButtonExit(MouseEvent event) {
-        if (event.getSource() == tableAddButton) {
-            tableAddButton.setStyle(tableAddButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
+        if (event.getSource() == addButton) {
+            addButton.setStyle(addButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
 
-        } else if(event.getSource() == tableSaveButton) {
-            tableSaveButton.setStyle(tableSaveButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
+        } else if(event.getSource() == saveButton) {
+            saveButton.setStyle(saveButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
 
-        } else if(event.getSource() == tableModifyButton) {
-            tableModifyButton.setStyle(tableModifyButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
+        } else if(event.getSource() == modifyButton) {
+            modifyButton.setStyle(modifyButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
 
-        } else if(event.getSource() == tableDeleteButton) {
-            tableDeleteButton.setStyle(tableDeleteButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
+        } else if(event.getSource() == deleteButton) {
+            deleteButton.setStyle(deleteButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
 
-        } else if(event.getSource() == tableCancelButton) {
-            tableCancelButton.setStyle(tableCancelButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
+        } else if(event.getSource() == cancelButton) {
+            cancelButton.setStyle(cancelButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
 
-        } else if(event.getSource() == tableAcceptButton) {
-            tableAcceptButton.setStyle(tableAcceptButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
+        } else if(event.getSource() == acceptButton) {
+            acceptButton.setStyle(acceptButton.getStyle().replaceAll("-fx-background-color:[^;]+;", "-fx-background-color: white;"));
         }
     }
 
+    /**
+     * Function creates a pop-up window to confirm deletion of selected record, after which (if acceptBtn clicked) proceeds to delete it from database.
+     *
+     * @param event The event triggered by clicking "deleteButton" button.
+     */
     @FXML
     private void deleteDataAction(ActionEvent event) {
-        Stage confstage = (Stage)((Node)event.getSource()).getScene().getWindow();
+        Stage confstage = (Stage)((Node)event.getSource()).getScene().getWindow(); // Window from which action has been called
 
         final Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -191,20 +221,19 @@ public class Controller implements Initializable {
         HBox dialogButtonsHbox = new HBox(10);
         dialogButtonsHbox.setAlignment(Pos.CENTER);
 
-        Button acceptButton = new Button("Tak");
-        acceptButton.setStyle("-fx-background-color: #63C05F");
-        acceptButton.setPrefSize(83, 33);
+        Button acceptBtn = new Button("Tak");
+        acceptBtn.setStyle("-fx-background-color: #63C05F");
+        acceptBtn.setPrefSize(83, 33);
 
-        Button cancelButton = new Button("Anuluj");
-        cancelButton.setStyle("-fx-background-color:  #FE6666");
-        cancelButton.setPrefSize(83, 33);
+        Button cancelBtn = new Button("Anuluj");
+        cancelBtn.setStyle("-fx-background-color:  #FE6666");
+        cancelBtn.setPrefSize(83, 33);
 
-        acceptButton.setOnAction(e -> {
+        acceptBtn.setOnAction(e -> {
             int index = myTable.getSelectionModel().getSelectedIndex();
             try {
                 if(onlineDB.deleteRecord(myTableObservableList.get(index).getId()) == 0) {
                     myTableObservableList.remove(index);
-                    searchFunction();
                 }
 
             } catch (SQLException e2) {
@@ -213,11 +242,11 @@ public class Controller implements Initializable {
             stage.close();
         });
 
-        cancelButton.setOnAction(e -> {
+        cancelBtn.setOnAction(e -> {
             stage.close();
         });
 
-        dialogButtonsHbox.getChildren().addAll(acceptButton, cancelButton);
+        dialogButtonsHbox.getChildren().addAll(acceptBtn, cancelBtn);
 
         Text dialogText = new Text("Czy chcesz kontynuować ?");
         dialogText.setFont(Font.font("Verdana", 16));
@@ -229,41 +258,33 @@ public class Controller implements Initializable {
         Scene dialogScene = new Scene(dialogVbox, 300, 200);
         stage.setScene(dialogScene);
         stage.showAndWait();
-        orderedSumUpdate();
+
+        searchFunction();   // refreshes tableView
+        orderedSumUpdate(); // updates sum of ordered products
     }
 
-    private void announcementPopUp(ActionEvent event, String announcement) {
-        Stage confstage = (Stage)((Node)event.getSource()).getScene().getWindow();
-
-        final Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.initOwner(confstage);
-
-        Text dialogText = new Text(announcement);
-        dialogText.setFont(Font.font("Verdana", 16));
-
-        VBox dialogVbox = new VBox(20);
-        dialogVbox.setAlignment(Pos.CENTER);
-        dialogVbox.getChildren().addAll(dialogText);
-
-        Scene dialogScene = new Scene(dialogVbox, 300, 200);
-        stage.setScene(dialogScene);
-        stage.showAndWait();
-    }
-
+    /**
+     * Puts the application's UI into 'modify state'.
+     * In this state, certain UI components are disabled, hidden, or made editable
+     * to allow the user to modify the data of a selected record.
+     * This method is triggered by an action, such as clicking a "modifyButton" button.
+     *
+     *
+     * Note: This method assumes the availability of various UI components (e.g., myTable, tableSearchBar, etc.).
+     */
     @FXML
-    private void modifyDataAction() {
+    private void enterModifyState() {
         myTable.setDisable(true);
         tableSearchBar.setDisable(true);
         tableDateFrom.setDisable(true);
         tableDateTo.setDisable(true);
 
-        tableModifyButton.setVisible(false);
-        tableAcceptButton.setVisible(true);
-        tableCancelButton.setVisible(true);
+        modifyButton.setVisible(false);
+        acceptButton.setVisible(true);
+        cancelButton.setVisible(true);
         productChoiceBox.setVisible(true);
         statusChoiceBox.setVisible(true);
-        tableDeleteButton.setVisible(false);
+        deleteButton.setVisible(false);
 
         cityTextField.setEditable(true);
         postalCodeTextField.setEditable(true);
@@ -278,8 +299,14 @@ public class Controller implements Initializable {
         infoTextArea.setEditable(true);
     }
 
+    /**
+     * Function updates existing or adds new record, based on action preceding it (e.g. "enterModifyState", "enterNewDataState").
+     *
+     * @param event The event triggered by clicking an "acceptButton" button.
+     */
     @FXML
     private void acceptDataAction(ActionEvent event) {
+        // Extract data from UI components
         int id = Integer.parseInt(idTextField.getText());
         String pc = postalCodeTextField.getText();
         String city = cityTextField.getText();
@@ -287,53 +314,65 @@ public class Controller implements Initializable {
         String surn = surnameTextField.getText();
         Date opd = Date.valueOf(orderPlacementDatePicker.getValue());
         Date ord = Date.valueOf(orderReceiptDatePicker.getValue());
-        String spec = productTextField.getText();//speciesChoiceBox.getValue();
+        String spec = productTextField.getText();
         int amt = Integer.parseInt(amountTextField.getText());
         double pr = Double.parseDouble((priceTextField.getText()));
         String stat = statusTextField.getText();
         String inf = infoTextArea.getText();
 
+        // Perform data update or insertion based on record ID
         if(id > 0){
-            if (onlineDB.updateRecord(id, pc, city, pn, surn, opd, ord, speciesOptions.get(spec), pr, amt, statusOptions.get(stat), inf) == 0) {
+            // Update existing record
+            if (onlineDB.updateRecord(id, pc, city, pn, surn, opd, ord, productOptions.get(spec), pr, amt, statusOptions.get(stat), inf) == 0) {
+                // Update the corresponding record in the ObservableList. Operation aimed for limiting data exchange between application and database
                 for (Person obj : myTableObservableList) {
                     if (obj.getId() == id) {
                         obj.updateAll(pc, city, pn, surn, opd, ord, spec, pr, amt, statusOptions.get(stat), inf);
-                        searchFunction(); //refreshes tableView
                     }
                 }
             } else {
-                announcementPopUp(event, "Blad modyfikacji");
+                PopUp.announcementPopUp(event, "Blad modyfikacji");
             }
 
         } else {
-            if (onlineDB.addRecord(pc, city, pn, surn, opd, ord, speciesOptions.get(spec), amt, statusOptions.get(stat), inf) == 0) {
+            // Insert new record
+            if (onlineDB.addRecord(pc, city, pn, surn, opd, ord, productOptions.get(spec), amt, statusOptions.get(stat), inf) == 0) {
                 try{
+                    // Downloads data from database in order to receive a valid ID number - necessary after creation of new record.
                     myTableObservableList.setAll(onlineDB.loadData());
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
 
             } else {
-                announcementPopUp(event, "Blad dodania");
+                PopUp.announcementPopUp(event, "Blad dodania");
             }
 
         }
-        orderedSumUpdate(); // updates sum of all active orders
-        cancelDataAction(); // exits 'modify state' of the table
+        // Refresh the table view, update sum, and exit modification state
+        searchFunction();
+        orderedSumUpdate();
+        exitModifyState();
     }
 
+    /**
+     * Lets the application's UI to exit 'modify state'.
+     * This method is triggered by an action, such as clicking a "cancelButton" button or simply after finishing of adding, updating or deletion of record.
+     *
+     * Note: This method assumes the availability of various UI components (e.g., myTable, tableSearchBar, etc.).
+     */
     @FXML
-    private void cancelDataAction() { // todo: change name to smth like: finish modifying data action
+    private void exitModifyState() {
         handleRowSelect();
         myTable.setDisable(false);
         tableSearchBar.setDisable(false);
         tableDateFrom.setDisable(false);
         tableDateTo.setDisable(false);
 
-        tableModifyButton.setVisible(true);
-        tableAcceptButton.setVisible(false);
-        tableCancelButton.setVisible(false);
-        tableDeleteButton.setVisible(true);
+        modifyButton.setVisible(true);
+        acceptButton.setVisible(false);
+        cancelButton.setVisible(false);
+        deleteButton.setVisible(true);
         productChoiceBox.setVisible(false);
         statusChoiceBox.setVisible(false);
 
@@ -353,10 +392,14 @@ public class Controller implements Initializable {
 
     }
 
+    /**
+     * Handles the click event of "addButton" button.
+     * Function uses "enterModifyState" function and sets default values for elements.
+     */
     @FXML
-    private void addDataAction() {
+    private void enterNewDataState() {
 
-        modifyDataAction();
+        enterModifyState();
 
         idTextField.setText(String.valueOf(-1));
         cityTextField.setText("n/a");
@@ -374,6 +417,9 @@ public class Controller implements Initializable {
 
     }
 
+    /**
+     * Handles selection of a record from 'left wing' of app, and displays it`s complete record information on 'right wing'.
+     */
     @FXML
     private void handleRowSelect() {
         int index = myTable.getSelectionModel().getSelectedIndex();
@@ -383,8 +429,8 @@ public class Controller implements Initializable {
         Person person = myTable.getSelectionModel().getSelectedItem();
 
         if(onlineDB.getConn() != null) {
-            tableDeleteButton.setDisable(false);
-            tableModifyButton.setDisable(false);
+            deleteButton.setDisable(false);
+            modifyButton.setDisable(false);
         }
 
         idTextField.setText(String.valueOf(person.getId()));
@@ -403,60 +449,28 @@ public class Controller implements Initializable {
 
     }
 
+    /**
+     * Handles event in which one of the search elements (e.g. tableSearchBar) has been updated.
+     */
     @FXML
     private void searchFunction() {
-
-        filteredList.setPredicate(person -> {
-
-            String searchBarInput = tableSearchBar.getText().toLowerCase();
-            boolean dateVar0 = false;
-            boolean dateVar1 = false;
-
-            if(tableDateFrom.getValue() == null)
-                dateVar0 = true;
-            else if(person.getOrderReceiptDate().compareTo(Date.valueOf(tableDateFrom.getValue())) >= 0)
-                dateVar0 = true;
-
-            if(tableDateTo.getValue() == null)
-                dateVar1 = true;
-            else if(person.getOrderReceiptDate().compareTo(Date.valueOf(tableDateTo.getValue())) <= 0)
-                dateVar1 = true;
-
-
-            if((tableSearchChoiceBox.getValue() == "Wszystko" || tableSearchChoiceBox.getValue() == "Nr.id") && (Integer.toString(person.getId()).indexOf(searchBarInput) > -1) && dateVar0 && dateVar1){
-                return true;
-            }else if((tableSearchChoiceBox.getValue() == "Wszystko" || tableSearchChoiceBox.getValue() == "Kod pocztowy") && (person.getPostalCode().toLowerCase().indexOf(searchBarInput) > -1) && dateVar0 && dateVar1){
-                return true;
-            }else if((tableSearchChoiceBox.getValue() == "Wszystko" || tableSearchChoiceBox.getValue() == "Miasto") && (person.getCity().toLowerCase().indexOf(searchBarInput) > -1) && dateVar0 && dateVar1){
-                return true;
-            }else if((tableSearchChoiceBox.getValue() == "Wszystko" || tableSearchChoiceBox.getValue() == "Nr.telefonu") && (person.getPhoneNumber().toLowerCase().indexOf(searchBarInput) > -1) && dateVar0 && dateVar1){
-                return true;
-            }else if((tableSearchChoiceBox.getValue() == "Wszystko" || tableSearchChoiceBox.getValue() == "Status") && (person.getStringStatus().toLowerCase().indexOf(searchBarInput) > -1) && dateVar0 && dateVar1){
-                return true;
-            }else if((tableSearchChoiceBox.getValue() == "Wszystko" || tableSearchChoiceBox.getValue() == "Nazwisko") && (person.getSurname().toLowerCase().indexOf(searchBarInput) > -1) && dateVar0 && dateVar1){
-                return true;
-            }else if((tableSearchChoiceBox.getValue() == "Wszystko" || tableSearchChoiceBox.getValue() == "Gatunek") && (person.getSpecies().toLowerCase().indexOf(searchBarInput) > -1) && dateVar0 && dateVar1){
-                return true;
-            }else if((tableSearchChoiceBox.getValue() == "Wszystko" || tableSearchChoiceBox.getValue() == "Opis") && (person.getInfo().toLowerCase().indexOf(searchBarInput) > -1) && dateVar0 && dateVar1){
-                return true;
-            }else {
-                return false;
-            }
-        });
+        SearchTool.searchFunction(filteredList, tableSearchBar, tableDateFrom, tableDateTo, tableSearchChoiceBox);
         orderedSumUpdate();
-
     }
 
-
-
+    /**
+     * Initializes the application's user interface upon startup.
+     * This method is automatically called by JavaFX after the FXML file is loaded.
+     *
+     * @param url The location used to resolve relative paths for the root object, or null if the location is not known.
+     * @param resource The resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resource)  {
-
-        productChoiceBox.getItems().addAll(speciesOptions.keySet());
+        productChoiceBox.getItems().addAll(productOptions.keySet());
         statusChoiceBox.getItems().addAll(statusOptions.keySet());
 
         try {
-
             productChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
                 productTextField.setText(newValue);
             });
@@ -465,18 +479,15 @@ public class Controller implements Initializable {
                 statusTextField.setText(newValue);
             });
 
-
-            tableAcceptButton.setVisible(false);
-            tableCancelButton.setVisible(false);
+            acceptButton.setVisible(false);
+            cancelButton.setVisible(false);
             productChoiceBox.setVisible(false);
             statusChoiceBox.setVisible(false);
-            tableDeleteButton.setDisable(true);
-            tableModifyButton.setDisable(true);
-
+            deleteButton.setDisable(true);
+            modifyButton.setDisable(true);
 
             tableSearchChoiceBox.getItems().addAll(choiceBoxSearchOptions);
             tableSearchChoiceBox.setValue(choiceBoxSearchOptions[0]);
-
 
             tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
             tablePostalCode.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
@@ -492,28 +503,20 @@ public class Controller implements Initializable {
                 myTableObservableList = onlineDB.loadData();
             } else {
                 myTableObservableList = offlineDB.loadFromFile();
-                tableModifyButton.setDisable(true);
-                tableAddButton.setDisable(true);
-                tableSaveButton.setDisable(true);
+                modifyButton.setDisable(true);
+                addButton.setDisable(true);
+                saveButton.setDisable(true);
 
             }
-
             myTable.setItems(myTableObservableList);
-
             filteredList = new FilteredList<>(myTableObservableList, p -> true);
-
             sortedList = new SortedList<>(filteredList);
-
             sortedList.comparatorProperty().bind(myTable.comparatorProperty());
-
             myTable.setItems(sortedList);
-
             orderedSumUpdate();
 
         } catch(SQLException e) {
             e.printStackTrace();
         }
-
     }
-
 }

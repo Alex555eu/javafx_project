@@ -1,22 +1,34 @@
-package com.example.jfx_project;
+package com.example.utils;
 
+import com.example.jfx_project.Person;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.sql.*;
 
-
-
+/**
+ * Utility class for handling database operations when connected to an online database.
+ */
 public class onlineDB {
 
     private static Connection conn =null;
     private static Statement statement=null;
     private static ResultSet res=null;
 
+    /**
+     * Returns the current database connection.
+     *
+     * @return The database connection.
+     */
     public static Connection getConn() {
         return conn;
     }
 
+    /**
+     * Opens a connection to the database.
+     *
+     * @return True if the connection was successful, otherwise false.
+     */
     public static boolean openConnection() {
         String url = "jdbc:mysql://localhost/giraffe";
         String uname = "root";
@@ -39,6 +51,9 @@ public class onlineDB {
         return true;
     }
 
+    /**
+     * Closes the database connection, statement, and result set.
+     */
     public static void closeConnection() {
         try {
             res.close();
@@ -57,6 +72,12 @@ public class onlineDB {
         }
     }
 
+    /**
+     * Loads data from the database and returns an ObservableList of Person objects.
+     *
+     * @return An ObservableList containing loaded Person objects.
+     * @throws SQLException If a database error occurs.
+     */
     public static ObservableList<Person> loadData() throws SQLException {
         //if(conn.isValid(5)) {
             conn.setAutoCommit(true);
@@ -114,6 +135,21 @@ public class onlineDB {
     }
 
 
+    /**
+     * Adds new Record into database.
+     *
+     * @param recordPostalCode         The new postal code value.
+     * @param recordCity               The new city value.
+     * @param recordPhoneNumber        The new phone number value.
+     * @param recordSurname            The new surname value.
+     * @param recordOrderPlacementDate The new order placement date value.
+     * @param recordOrderReceiptDate   The new order receipt date value.
+     * @param recordSpecies            The new species ID value.
+     * @param recordAmount             The new amount value.
+     * @param recordStatus             The new status value.
+     * @param recordInfo               The new info value.
+     * @return A status code indicating the result of the update operation.
+     */
     public static int addRecord(String recordPostalCode, String recordCity, String recordPhoneNumber, String recordSurname, Date recordOrderPlacementDate, Date recordOrderReceiptDate, int recordSpecies, int recordAmount, int recordStatus, String recordInfo) {
         try {
             if (conn.isValid(5)) {
@@ -141,8 +177,6 @@ public class onlineDB {
                 }
             } else
                 return -1;
-
-
         }catch (SQLException e) {
             e.printStackTrace();
             return -5;
@@ -151,6 +185,13 @@ public class onlineDB {
         return 0;
     }
 
+    /**
+     * Deletes record from database, according to given unique ID number.
+     *
+     * @param id The unique orders ID number
+     * @return A status code indicating the result of the update operation.
+     * @throws SQLException If a database error occurs.
+     */
     public static int deleteRecord(int id) throws SQLException {
         if(conn.isValid(5)) {
             conn.setAutoCommit(false);
@@ -183,10 +224,26 @@ public class onlineDB {
         } else {
             return -1;
         }
-
         return 0;
     }
 
+    /**
+     * Updates the status of a record in the database.
+     *
+     * @param recordID                 The ID of the record to be updated.
+     * @param recordPostalCode         The new postal code value.
+     * @param recordCity               The new city value.
+     * @param recordPhoneNumber        The new phone number value.
+     * @param recordSurname            The new surname value.
+     * @param recordOrderPlacementDate The new order placement date value.
+     * @param recordOrderReceiptDate   The new order receipt date value.
+     * @param recordSpecies            The new species ID value.
+     * @param recordPrice              The new price value.
+     * @param recordAmount             The new amount value.
+     * @param recordStatus             The new status value.
+     * @param recordInfo               The new info value.
+     * @return A status code indicating the result of the update operation.
+     */
     public static int updateRecord(int recordID, String recordPostalCode, String recordCity, String recordPhoneNumber, String recordSurname, Date recordOrderPlacementDate, Date recordOrderReceiptDate, int recordSpecies, double recordPrice, int recordAmount, int recordStatus, String recordInfo) {
         try {
             if (conn.isValid(5)) {
@@ -203,12 +260,10 @@ public class onlineDB {
                     conn.rollback(savepoint);
                     return -4;
                 }
-
                 if (!res.next()) {
                     conn.rollback(savepoint);
                     return -3;
                 }
-
                 String query2 = "update giraffe.persondata set"
                                 + " postalCode = \"" + recordPostalCode
                                 + "\" ,city = \"" + recordCity
@@ -235,16 +290,12 @@ public class onlineDB {
                 }
             } else
                 return -1;
-
-
         }catch (SQLException e) {
             e.printStackTrace();
             return -5;
         }
-
         return 0;
     }
-
 
 
 }
