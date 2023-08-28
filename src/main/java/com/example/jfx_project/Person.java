@@ -1,8 +1,5 @@
 package com.example.jfx_project;
 
-import javafx.beans.binding.NumberBinding;
-import javafx.beans.value.ObservableIntegerValue;
-
 import java.io.Serializable;
 import java.sql.Date;
 
@@ -17,12 +14,13 @@ public class Person implements Serializable {
     private Date orderPlacementDate;
     private Date orderReceiptDate;
     private String species;
+    private double price;
     private int amount;
     private int status;
     private String stringStatus="";
     private String info;
 
-    public Person(int id, String postalCode, String city, String phoneNumber, String surname, Date orderPlacementDate, Date orderReceiptDate, String species, int amount, int status, String info) {
+    public Person(int id, String postalCode, String city, String phoneNumber, String surname, Date orderPlacementDate, Date orderReceiptDate, String species, double price, int amount, int status, String info) {
         this.id = id;
         this.postalCode = postalCode;
         this.city = city;
@@ -32,12 +30,13 @@ public class Person implements Serializable {
         this.orderReceiptDate = orderReceiptDate;
         this.species = species;
         this.amount = amount;
+        this.price = price;
         this.info = info;
         setStatus(status); // sets both, status and stringStatus values
     }
 
 
-    public void updateAll(String postalCode, String city, String phoneNumber, String surname, Date orderPlacementDate, Date orderReceiptDate, String species, int amount, int status, String info){
+    public void updateAll(String postalCode, String city, String phoneNumber, String surname, Date orderPlacementDate, Date orderReceiptDate, String species, double price, int amount, int status, String info){
         setPostalCode(postalCode);
         setCity(city);
         setPhoneNumber(phoneNumber);
@@ -46,6 +45,7 @@ public class Person implements Serializable {
         setOrderReceiptDate(orderReceiptDate);
         setSpecies(species);
         setAmount(amount);
+        setPrice(price);
         setInfo(info);
         setStatus(status);
 
@@ -105,6 +105,14 @@ public class Person implements Serializable {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public String getInfo() {

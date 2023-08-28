@@ -71,6 +71,7 @@ public class onlineDB {
                         pd.orderPlacementDate,\s
                         pd.orderReceiptDate,\s
                         sp.nameSpecies,\s
+                        pd.price,\s
                         pd.amountOrdered,\s
                         pd.status,\s
                         pd.info\s
@@ -79,24 +80,6 @@ public class onlineDB {
                     on pd.speciesById = sp.idSpecies\s
                     order by pd.idPersonData;
                     """;
-
-        String query2 = "select "
-                + "pd.IdPersonData, "
-                + "pd.postalCode, "
-                + "pd.city, "
-                + "pd.phoneNumber, "
-                + "pd.surname, "
-                + "pd.orderPlacementDate, "
-                + "pd.orderReceiptDate, "
-                + "sp.nameSpecies, "
-                + "pd.amountOrdered, "
-                + "pd.status, "
-                + "pd.info "
-                + "FROM giraffe.persondata pd "
-                + "join giraffe.species sp "
-                + "on pd.speciesById = sp.idSpeciess "
-                + "order by pd.idPersonData;";
-
 
             ObservableList<Person> list = FXCollections.observableArrayList();
 
@@ -113,11 +96,12 @@ public class onlineDB {
                     Date queryOrderPlacementDate = res.getDate("orderPlacementDate");
                     Date queryOrderReceiptDate = res.getDate("orderReceiptDate");
                     String querySpecies = res.getString("nameSpecies");
+                    Double queryPrice = res.getDouble("price");
                     Integer queryAmount = res.getInt("amountOrdered");
                     Integer queryStatus = res.getInt("status");
                     String queryInfo = res.getString("info");
 
-                    list.add(new Person(queryID, queryPostalCode, queryCity, queryPhoneNumber, querySurname, queryOrderPlacementDate, queryOrderReceiptDate, querySpecies, queryAmount, queryStatus, queryInfo));
+                    list.add(new Person(queryID, queryPostalCode, queryCity, queryPhoneNumber, querySurname, queryOrderPlacementDate, queryOrderReceiptDate, querySpecies, queryPrice, queryAmount, queryStatus, queryInfo));
 
                 }
             } catch (SQLException e) {
@@ -203,7 +187,7 @@ public class onlineDB {
         return 0;
     }
 
-    public static int updateRecord(int recordID, String recordPostalCode, String recordCity, String recordPhoneNumber, String recordSurname, Date recordOrderPlacementDate, Date recordOrderReceiptDate, int recordSpecies, int recordAmount, int recordStatus, String recordInfo) {
+    public static int updateRecord(int recordID, String recordPostalCode, String recordCity, String recordPhoneNumber, String recordSurname, Date recordOrderPlacementDate, Date recordOrderReceiptDate, int recordSpecies, double recordPrice, int recordAmount, int recordStatus, String recordInfo) {
         try {
             if (conn.isValid(5)) {
                 conn.setAutoCommit(false);
@@ -233,6 +217,7 @@ public class onlineDB {
                                 + "\" ,orderPlacementDate = \"" + recordOrderPlacementDate
                                 + "\" ,orderReceiptDate = \"" + recordOrderReceiptDate
                                 + "\" ,speciesById = " + recordSpecies
+                                + " ,price = " + recordPrice
                                 + " ,amountOrdered = " + recordAmount
                                 + " ,status = " + recordStatus
                                 + " ,info = \"" + recordInfo

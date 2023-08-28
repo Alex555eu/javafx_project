@@ -1,18 +1,13 @@
 package com.example.jfx_project;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -21,17 +16,13 @@ import javafx.fxml.FXML;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -41,13 +32,10 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 
 public class Controller implements Initializable {
 
-    @FXML
-    private ScrollPane scrollPane;
     @FXML
     private AnchorPane myPane;
     @FXML
@@ -59,13 +47,13 @@ public class Controller implements Initializable {
     @FXML
     private TableColumn<Person, String> tableCity;
     @FXML
-    private TableColumn<Person, String> tablePhoneNumber;
+    private TableColumn<Person, String> tablePrice;
     @FXML
     private TableColumn<Person, String> tableSurname;
     @FXML
     private TableColumn<Person, Date> tableOrderReceiptDate;
     @FXML
-    private TableColumn<Person, String> tableSpecies;
+    private TableColumn<Person, String> tableProduct;
     @FXML
     private TableColumn<Person, Integer> tableAmount;
     @FXML
@@ -87,9 +75,11 @@ public class Controller implements Initializable {
     @FXML
     private DatePicker orderReceiptDatePicker;
     @FXML
-    private TextField speciesTextField;
+    private TextField productTextField;
     @FXML
     private TextField amountTextField;
+    @FXML
+    private TextField priceTextField;
     @FXML
     private TextField statusTextField;
     @FXML
@@ -102,7 +92,7 @@ public class Controller implements Initializable {
     private DatePicker tableDateTo;
     @FXML
     private ChoiceBox<String> tableSearchChoiceBox;
-    private final String[] choiceBoxSearchOptions = {"Wszystko", "Nr.id", "Kod pocztowy", "Miasto", "Nr.telefonu", "Nazwisko", "Gatunek", "Status", "Opis"};
+    private final String[] choiceBoxSearchOptions = {"Wszystko", "Nr.id", "Kod pocztowy", "Miasto", "Nr.telefonu", "Nazwisko", "Nazwa", "Status", "Opis"};
     @FXML
     private Button tableModifyButton;
     @FXML
@@ -116,7 +106,7 @@ public class Controller implements Initializable {
     @FXML
     private Button tableSaveButton;
     @FXML
-    private ChoiceBox<String> speciesChoiceBox;
+    private ChoiceBox<String> productChoiceBox;
     private final Map<String, Integer> speciesOptions = new TreeMap<>(Map.of("Ges Biala",1, "Ges Szara",2, "Pekin",3, "Barbarie",4, "Mulard",5));
     @FXML
     private ChoiceBox<String> statusChoiceBox;
@@ -126,6 +116,8 @@ public class Controller implements Initializable {
     private ObservableList<Person> myTableObservableList;
     private FilteredList<Person> filteredList;
     private SortedList<Person> sortedList;
+
+
 
     private void orderedSumUpdate() {
         int sum=0;
@@ -269,7 +261,7 @@ public class Controller implements Initializable {
         tableModifyButton.setVisible(false);
         tableAcceptButton.setVisible(true);
         tableCancelButton.setVisible(true);
-        speciesChoiceBox.setVisible(true);
+        productChoiceBox.setVisible(true);
         statusChoiceBox.setVisible(true);
         tableDeleteButton.setVisible(false);
 
@@ -280,8 +272,8 @@ public class Controller implements Initializable {
         surnameTextField.setEditable(true);
         orderPlacementDatePicker.setEditable(true);
         orderReceiptDatePicker.setEditable(true);
-        //speciesTextField.setEditable(true);
         amountTextField.setEditable(true);
+        priceTextField.setEditable(true);
         statusTextField.setEditable(true);
         infoTextArea.setEditable(true);
     }
@@ -295,17 +287,18 @@ public class Controller implements Initializable {
         String surn = surnameTextField.getText();
         Date opd = Date.valueOf(orderPlacementDatePicker.getValue());
         Date ord = Date.valueOf(orderReceiptDatePicker.getValue());
-        String spec = speciesTextField.getText();//speciesChoiceBox.getValue();
+        String spec = productTextField.getText();//speciesChoiceBox.getValue();
         int amt = Integer.parseInt(amountTextField.getText());
+        double pr = Double.parseDouble((priceTextField.getText()));
         String stat = statusTextField.getText();
         String inf = infoTextArea.getText();
 
         if(id > 0){
-            if (onlineDB.updateRecord(id, pc, city, pn, surn, opd, ord, speciesOptions.get(spec), amt, statusOptions.get(stat), inf) == 0) {
+            if (onlineDB.updateRecord(id, pc, city, pn, surn, opd, ord, speciesOptions.get(spec), pr, amt, statusOptions.get(stat), inf) == 0) {
                 for (Person obj : myTableObservableList) {
                     if (obj.getId() == id) {
-                        obj.updateAll(pc, city, pn, surn, opd, ord, spec, amt, statusOptions.get(stat), inf);
-                        searchFunction();   //refreshes tableView
+                        obj.updateAll(pc, city, pn, surn, opd, ord, spec, pr, amt, statusOptions.get(stat), inf);
+                        searchFunction(); //refreshes tableView
                     }
                 }
             } else {
@@ -341,7 +334,7 @@ public class Controller implements Initializable {
         tableAcceptButton.setVisible(false);
         tableCancelButton.setVisible(false);
         tableDeleteButton.setVisible(true);
-        speciesChoiceBox.setVisible(false);
+        productChoiceBox.setVisible(false);
         statusChoiceBox.setVisible(false);
 
         idTextField.setEditable(false);
@@ -352,8 +345,9 @@ public class Controller implements Initializable {
         surnameTextField.setEditable(false);
         orderPlacementDatePicker.setEditable(false);
         orderReceiptDatePicker.setEditable(false);
-        speciesTextField.setEditable(false);
+        productTextField.setEditable(false);
         amountTextField.setEditable(false);
+        priceTextField.setEditable(false);
         statusTextField.setEditable(false);
         infoTextArea.setEditable(false);
 
@@ -371,8 +365,9 @@ public class Controller implements Initializable {
         surnameTextField.setText("n/a");
         orderPlacementDatePicker.setValue(LocalDate.now());
         orderReceiptDatePicker.setValue(LocalDate.now());
-        speciesTextField.setText("n/a");
+        productTextField.setText("n/a");
         amountTextField.setText(String.valueOf(0));
+        priceTextField.setText((String.valueOf(0)));
         statusTextField.setText("n/a");
         statusTextField.setStyle(statusTextField.getStyle().replaceAll("-fx-text-fill:[^;]+;", "-fx-text-fill: #000000;"));;
         infoTextArea.setText("n/a");
@@ -399,8 +394,9 @@ public class Controller implements Initializable {
         surnameTextField.setText(person.getSurname());
         orderPlacementDatePicker.setValue(person.getOrderPlacementDate().toLocalDate());
         orderReceiptDatePicker.setValue(person.getOrderReceiptDate().toLocalDate());
-        speciesTextField.setText(person.getSpecies());
+        productTextField.setText(person.getSpecies());
         amountTextField.setText(String.valueOf(person.getAmount()));
+        priceTextField.setText((String.valueOf(person.getPrice())));
         statusTextField.setText(person.getStringStatus());
         statusTextField.setStyle(statusTextField.getStyle().replaceAll("-fx-text-fill:[^;]+;", colorOptions.get(person.getStatus())));
         infoTextArea.setText(person.getInfo());
@@ -456,13 +452,13 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resource)  {
 
-        speciesChoiceBox.getItems().addAll(speciesOptions.keySet());
+        productChoiceBox.getItems().addAll(speciesOptions.keySet());
         statusChoiceBox.getItems().addAll(statusOptions.keySet());
 
         try {
 
-            speciesChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                speciesTextField.setText(newValue);
+            productChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                productTextField.setText(newValue);
             });
 
             statusChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -472,7 +468,7 @@ public class Controller implements Initializable {
 
             tableAcceptButton.setVisible(false);
             tableCancelButton.setVisible(false);
-            speciesChoiceBox.setVisible(false);
+            productChoiceBox.setVisible(false);
             statusChoiceBox.setVisible(false);
             tableDeleteButton.setDisable(true);
             tableModifyButton.setDisable(true);
@@ -485,11 +481,11 @@ public class Controller implements Initializable {
             tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
             tablePostalCode.setCellValueFactory(new PropertyValueFactory<>("postalCode"));
             tableCity.setCellValueFactory(new PropertyValueFactory<>("city"));
-            tablePhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
             tableSurname.setCellValueFactory(new PropertyValueFactory<>("surname"));
             tableOrderReceiptDate.setCellValueFactory(new PropertyValueFactory<>("orderReceiptDate"));
-            tableSpecies.setCellValueFactory(new PropertyValueFactory<>("species"));
+            tableProduct.setCellValueFactory(new PropertyValueFactory<>("species"));
             tableAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+            tablePrice.setCellValueFactory(new PropertyValueFactory<>("price"));
             tableStatus.setCellValueFactory(new PropertyValueFactory<>("stringStatus"));
 
             if(onlineDB.getConn() != null) {
@@ -504,7 +500,7 @@ public class Controller implements Initializable {
 
             myTable.setItems(myTableObservableList);
 
-            filteredList = new FilteredList<>(myTableObservableList, p -> true); // ???!!!
+            filteredList = new FilteredList<>(myTableObservableList, p -> true);
 
             sortedList = new SortedList<>(filteredList);
 
