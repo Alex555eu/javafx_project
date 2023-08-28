@@ -1,4 +1,4 @@
-package com.example.constrollers;
+package com.example.jfx_project;
 
 import com.example.utils.PopUp;
 import com.example.utils.onlineDB;
@@ -70,9 +70,7 @@ public class loginController implements Initializable {
         Stage primaryStage = (Stage)((Node)event.getSource()).getScene().getWindow();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("my-view.fxml"));
-        Parent root;
-
-        root = loader.load();
+        Parent root = loader.load();
 
         Rectangle2D rec = Screen.getPrimary().getVisualBounds();
         double width = rec.getWidth();

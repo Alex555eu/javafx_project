@@ -1,4 +1,4 @@
-package com.example.constrollers;
+package com.example.jfx_project;
 
 import com.example.jfx_project.Person;
 import com.example.jfx_project.SearchTool;
