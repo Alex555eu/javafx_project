@@ -1,7 +1,7 @@
 
 # Notes - a JavaFX Application 
 
-The purpose of this application is to help monitor a flow of product sales. It serves as a connector between the warehouse and a customers, storing history of previous orders as well as ongoing ones. 
+The purpose of this application is to help monitor a flow of product sales. It serves as a connector between the warehouse and customers, storing history of previous orders as well as ongoing ones. 
 
 ## Features
 
