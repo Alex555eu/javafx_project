@@ -132,7 +132,7 @@
                                     </ChoiceBox>
                                  </children>
                               </HBox>
-                              <Label prefWidth="130.0" text="Rodzaj wiertła:">
+                              <Label prefWidth="130.0" text="Gatunek:">
                                  <font>
                                     <Font name="System Bold" size="14.0" />
                                  </font>
