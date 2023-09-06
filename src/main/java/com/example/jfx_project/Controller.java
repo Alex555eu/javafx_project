@@ -248,7 +248,7 @@ public class Controller implements Initializable {
 
         dialogButtonsHbox.getChildren().addAll(acceptBtn, cancelBtn);
 
-        Text dialogText = new Text("Czy chcesz kontynuować ?");
+        Text dialogText = new Text("Usunąć ?");
         dialogText.setFont(Font.font("Verdana", 16));
 
         VBox dialogVbox = new VBox(20);

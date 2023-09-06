@@ -120,7 +120,7 @@
                               </Label>
                               <HBox alignment="CENTER_LEFT" spacing="3.0">
                                  <children>
-                                    <TextField fx:id="statusTextField" editable="false" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="130.0" promptText="-/-" style="-fx-border-style: solid; -fx-border-width: 3; -fx-border-color: #ce5c20; -fx-border-radius: 15; -fx-background-radius: 15; -fx-background-insets: 1; -fx-text-fill: #000000;">
+                                    <TextField fx:id="statusTextField" alignment="CENTER" editable="false" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="130.0" promptText="-/-" style="-fx-border-style: solid; -fx-border-width: 3; -fx-border-color: #ce5c20; -fx-border-radius: 15; -fx-background-radius: 15; -fx-background-insets: 1; -fx-text-fill: #000000;">
                                        <font>
                                           <Font size="14.0" />
                                        </font>
@@ -236,7 +236,7 @@
             <TableColumn fx:id="tableCity" prefWidth="110.0" resizable="false" text="Miasto" />
             <TableColumn fx:id="tableSurname" prefWidth="110.0" resizable="false" text="Nazwisko" />
             <TableColumn fx:id="tableOrderReceiptDate" prefWidth="110.0" resizable="false" text="Data odbioru" />
-            <TableColumn fx:id="tableProduct" prefWidth="110.0" resizable="false" text="Wiertło" />
+            <TableColumn fx:id="tableProduct" prefWidth="110.0" resizable="false" text="Gatunek" />
             <TableColumn fx:id="tableAmount" prefWidth="110.0" resizable="false" text="Ilość" />
             <TableColumn fx:id="tablePrice" prefWidth="110.0" resizable="false" text="Cena" />
             <TableColumn fx:id="tableStatus" prefWidth="107.0" resizable="false" text="Status" />
