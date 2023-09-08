@@ -2,6 +2,7 @@ package com.example.jfx_project;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.Objects;
 
 /**
  * Class for holding data from databse
@@ -81,6 +82,31 @@ public class Person implements Serializable {
         setInfo(info);
         setStatus(status);
 
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Person other = (Person) obj;
+        return  Objects.equals(id, other.id)
+                && Objects.equals(postalCode, other.postalCode)
+                && Objects.equals(city, other.city)
+                && Objects.equals(phoneNumber, other.phoneNumber)
+                && Objects.equals(surname, other.surname)
+                && Objects.equals(orderPlacementDate, other.orderPlacementDate)
+                && Objects.equals(orderReceiptDate, other.orderReceiptDate)
+                && Objects.equals(species, other.species)
+                && Objects.equals(amount, other.amount)
+                && Objects.equals(info, other.info)
+                && Objects.equals(stringStatus, other.stringStatus)
+                && Objects.equals(status, other.status);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, postalCode, city, phoneNumber, surname, orderPlacementDate, orderReceiptDate, species, amount, status, info);
     }
 
     /**

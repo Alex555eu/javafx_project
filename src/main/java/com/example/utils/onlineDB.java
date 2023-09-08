@@ -56,17 +56,15 @@ public class onlineDB {
      */
     public static void closeConnection() {
         try {
-            res.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            statement.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            conn.close();
+            if (res != null) {
+                res.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,9 +76,8 @@ public class onlineDB {
      * @return An ObservableList containing loaded Person objects.
      * @throws SQLException If a database error occurs.
      */
-    public static ObservableList<Person> loadData() throws SQLException {
+    public static ObservableList<Person> loadData() {
         //if(conn.isValid(5)) {
-            conn.setAutoCommit(true);
             //String query = "SELECT idPersonData, postalCode, city, phoneNumber, status, info FROM persondata;"; //old query
             String query = """
                     SELECT\s
@@ -105,6 +102,8 @@ public class onlineDB {
             ObservableList<Person> list = FXCollections.observableArrayList();
 
             try {
+                conn.setAutoCommit(true);
+
                 statement = conn.createStatement();
                 res = statement.executeQuery(query);
 
@@ -192,37 +191,42 @@ public class onlineDB {
      * @return A status code indicating the result of the update operation.
      * @throws SQLException If a database error occurs.
      */
-    public static int deleteRecord(int id) throws SQLException {
-        if(conn.isValid(5)) {
-            conn.setAutoCommit(false);
-            Savepoint savepoint = conn.setSavepoint();
+    public static int deleteRecord(int id) {
+        try {
+            if (conn.isValid(5)) {
+                conn.setAutoCommit(false);
+                Savepoint savepoint = conn.setSavepoint();
 
-            String query1 = "select idPersonData from giraffe.persondata where idPersondata = " + id + ";";
-            try {
-                statement = conn.createStatement();
-                res = statement.executeQuery(query1);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                conn.rollback(savepoint);
-            }
+                String query1 = "select idPersonData from giraffe.persondata where idPersondata = " + id + ";";
+                try {
+                    statement = conn.createStatement();
+                    res = statement.executeQuery(query1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    conn.rollback(savepoint);
+                }
 
-            if (!res.next()) {
-                conn.rollback(savepoint);
-                return -3;
-            }
+                if (!res.next()) {
+                    conn.rollback(savepoint);
+                    return -3;
+                }
 
-            String query2 = "delete from giraffe.persondata where idPersonData = " + id + ";";
-            try {
-                statement = conn.createStatement();
-                statement.executeUpdate(query2);
-                conn.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                conn.rollback(savepoint);
-                return -2;
+                String query2 = "delete from giraffe.persondata where idPersonData = " + id + ";";
+                try {
+                    statement = conn.createStatement();
+                    statement.executeUpdate(query2);
+                    conn.commit();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    conn.rollback(savepoint);
+                    return -2;
+                }
+            } else {
+                return -1;
             }
-        } else {
-            return -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -5;
         }
         return 0;
     }

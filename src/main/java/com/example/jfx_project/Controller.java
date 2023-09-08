@@ -231,14 +231,11 @@ public class Controller implements Initializable {
 
         acceptBtn.setOnAction(e -> {
             int index = myTable.getSelectionModel().getSelectedIndex();
-            try {
-                if(onlineDB.deleteRecord(myTableObservableList.get(index).getId()) == 0) {
-                    myTableObservableList.remove(index);
-                }
 
-            } catch (SQLException e2) {
-                e2.printStackTrace();
+            if(onlineDB.deleteRecord(myTableObservableList.get(index).getId()) == 0) {
+                myTableObservableList.remove(index);
             }
+
             stage.close();
         });
 
@@ -337,12 +334,8 @@ public class Controller implements Initializable {
         } else {
             // Insert new record
             if (onlineDB.addRecord(pc, city, pn, surn, opd, ord, productOptions.get(spec), amt, statusOptions.get(stat), inf) == 0) {
-                try{
-                    // Downloads data from database in order to receive a valid ID number - necessary after creation of new record.
-                    myTableObservableList.setAll(onlineDB.loadData());
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                // Downloads data from database in order to receive a valid ID number - necessary after creation of new record.
+                myTableObservableList.setAll(onlineDB.loadData());
 
             } else {
                 PopUp.announcementPopUp(event, "Blad dodania");
@@ -515,7 +508,7 @@ public class Controller implements Initializable {
             myTable.setItems(sortedList);
             orderedSumUpdate();
 
-        } catch(SQLException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
     }
